@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.Title = "Login";
+    string email = Request.Cookies["email"] != null ? Request.Cookies["email"].Value : string.Empty;
+}
+
+<!-- TODO: Clean up logic for login memorization, if already logged in stay logged in forever, unless logout is clicked (only for small devices) -->
+<!-- Make sure signup works, and error handling works (sendhub failures, duplicates) -->
+<!-- TODO: Enable Share links -->
+<!-- TODO: Add How It Works Content -->
+<!-- TODO: Add tabs for Login / Signup / How It Works -->
+
+<div class="container">
+	<div class="container text-center">
+	    <div class="form-signin" data-ember-action="2">
+	    	<img src="~/images/referrals_logo1.jpg" />
+
+			<input id="txtLoginEmail" class="ember-view ember-text-field form-control login-input" value="@email" placeholder="Email Address" type="text">
+	        <input id="txtLoginPassword" class="ember-view ember-text-field form-control login-input-pass" placeholder="Password" type="password">
+            <a id="btnSignIn" href="#" type="button" class="btn btn-md btn-primary btn-block">Sign in</a>
+            
+            <p style="margin:5px;">OR</p>
+            
+            <a id="btnRegister" href="#signupform" data-toggle="modal" type="button" class="ember-view btn btn-info btn-block"> Register </a>
+            
+	        <br>
+            <label class="text-muted">OR, connect your favorite social network</label>
+			<br>
+            <p>
+            <a class="btn btn-primary social-facebook" href="/auth/facebook"><i class="fa fa-facebook"></i></a>
+            <a class="btn btn-primary social-twitter" href="/auth/twitter"><i class="fa fa-twitter"></i></a>
+            <a class="btn btn-primary social-linkedin" href="/auth/linkedin"><i class="fa fa-linkedin"></i></a>
+            <a class="btn btn-primary social-google" href="/auth/google"><i class="fa fa-google-plus"></i></a>
+            </p>
+
+            <div class="btn-group social-login-more">
+              <button type="button" class="btn btn-default dropdown-toggle btn-block" data-toggle="dropdown">
+                More...
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#"><i class="fa fa-tumblr-sign"></i>   Tumblr</a></li>
+                <li><a href="#"><i class="fa fa-github-alt"></i>   Github</a></li>
+                <li><a href="#"><i class="fa fa-dropbox"></i>   Dropbox</a></li>
+                <li><a href="/auth/amazon"><span class="zocial-amazon"></span>   Amazon</a></li>
+                <li><a href="#"><span class="zocial-bitbucket"></span>   Bitbucket</a></li>
+                <li><a href="#"><span class="zocial-evernote"></span>   Evernote</a></li>
+                <li><a href="#"><span class="zocial-meetup"></span>   Meetup</a></li>
+                <li><a href="#"><i class="fa fa-windows"></i>   Windows Live</a></li>
+                <li><a href="#"><i class="fa fa-weibo"></i>   Weibo</a></li>
+                <li><a href="#"><i class="fa fa-foursquare"></i>   Foursquare</a></li>
+                <li><a href="#"><i class="fa fa-stackexchange"></i>   Stack Exchange</a></li>
+                <li><a href="#"><i class="fa fa-trello"></i>   Trello</a></li>
+                <li><a href="#"><span class="zocial-wordpress"></span>   Wordpress</a></li>
+              </ul>
+            </div>
+	    </div>
+    </div>
+</div>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="7200acdb6728430b94c8c6c455b6eb8d" Name="Diagram1">
+        <EntityTypeShape EntityType="ReferralsModel.Account" Width="1.5" PointX="3" PointY="8.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReferralsModel.AccountContact" Width="1.5" PointX="5.25" PointY="11.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReferralsModel.AccountLocation" Width="1.5" PointX="8.25" PointY="11.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReferralsModel.AccountProfession" Width="1.5" PointX="5.25" PointY="8.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReferralsModel.Action" Width="1.5" PointX="9" PointY="8.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReferralsModel.CommMethod" Width="1.5" PointX="9" PointY="16.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReferralsModel.Communication" Width="1.5" PointX="11.25" PointY="9.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReferralsModel.Country" Width="1.5" PointX="0.75" PointY="9.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReferralsModel.Job" Width="1.5" PointX="5.25" PointY="16.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReferralsModel.Profession" Width="1.5" PointX="3" PointY="4.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReferralsModel.State" Width="1.5" PointX="0.75" PointY="15.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReferralsModel.Status" Width="1.5" PointX="0.75" PointY="12" IsExpanded="true" />
+        <AssociationConnector Association="ReferralsModel.fk_Account_Country" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Account_State" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Account_Status" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_AccountContacts_Account_Account" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_AccountContacts_Account_Contact" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_AccountLocations_Account" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_AccountProfessions_Account" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Communication_Account_From" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Communication_Account_Referred" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Communication_Account_To" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Job_Account_PostedBy" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_AccountContact_Status" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_AccountLocations_Country" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_AccountLocations_State" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_AccountProfessions_Profession" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Communication_Action" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Communication_CommMethod" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Communication_Job" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Communication_StatusReferred" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Communication_StatusTo" ManuallyRouted="false" />
+        <AssociationConnector Association="ReferralsModel.fk_Job_Status" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

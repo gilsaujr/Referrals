@@ -1,0 +1,143 @@
+﻿@using Referrals.ReferralsServices
+@model IList<Account>
+@{
+    ViewBag.Title = "Find Professionals";
+
+    string firstname = Request.QueryString["find-firstname"] != null ? Request.QueryString["find-firstname"] : string.Empty;
+    string lastname = Request.QueryString["find-lastname"] != null ? Request.QueryString["find-lastname"] : string.Empty;
+    int stateId = Request.QueryString["find-state"] != null ? int.Parse(Request.QueryString["find-state"]) : 0;
+    int countryId = Request.QueryString["find-country"] != null ? int.Parse(Request.QueryString["find-country"]) : 0;
+    string[] professions = Request.QueryString["find-professions"] != null ? Request.QueryString["find-professions"].Split(',') : null;
+
+    int activeTab = Request.QueryString["tab"] != null ? int.Parse(Request.QueryString["tab"]) : 1;
+}
+
+@section Scripts{
+    <script src="@Url.Content("~/scripts")/find.js"></script>
+}
+
+<!-- TODO: Add loading symbol while page first loads -->
+<!-- TODO: Add pagination to search results -->
+<!-- TODO: Add sorting dropdowns for each tab -->
+<!-- TODO: Add tabs, one for searching internally, another for inviting friends from social networks -->
+<!-- TODO: Add 'Find near me' under 'By Location', add 2 tabs 'By State' or 'Near Me' -->
+<!-- TODO: 'Send Rolodex Invite' button functionality -->
+<!-- TODO: 'Send Message' button functionality -->
+<!-- TODO: 'Send Rating/Reviews' button functionality -->
+
+<p>&nbsp;</p>
+
+<!-- Tabs navigation -->
+<ul class="nav nav-tabs">
+    <li @{ if(activeTab == 1){ <text>class="active"</text> } } ><a id="tab1-link" href="#tab1" data-toggle="tab">Search Members</a></li>
+    <li @{ if(activeTab == 2){ <text>class="active"</text> } } ><a id="tab2-link" href="#tab2" data-toggle="tab">Search Social Sites</a></li>
+</ul>
+
+<!-- Tab Sections -->
+<div class="tab-content">
+
+    <!--SEARCH MEMBERS -->
+    <div class="tab-pane @{ if(activeTab == 1){ <text>active</text> } }" id="tab1">
+        <form action="~/members/find" method="get">
+            <div class="panel panel-info" style="margin:20px;">
+                <h4 class="panel-heading">Search Filter <small class="text-info">( Choose any fields, all are optional )</small></h4>
+                <div class="panel-body" style="padding:10px;">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div><strong>By Name</strong></div>
+                            <input type="text" class="form-control" placeholder="first name" id="find-firstname" name="find-firstname" value="@firstname" />
+                            <input type="text" class="form-control" style="margin-top:10px;" placeholder="last name" id="find-lastname" name="find-lastname" value="@lastname" />
+                            <div class="divider-for-small"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <hr class="divider-for-small" />
+                            <div><strong>By Location</strong></div>
+                            <div>
+                                <select class="form-control thin-dropdown" id="find-state" name="find-state">
+                                    <option value="0">Select State</option>
+                                    @foreach (State state in ViewBag.States)
+                                    {
+                                        <option value="@state.Id" @{ if(state.Id == stateId){ <text>selected="selected"</text>  } }>@state.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div>
+                                <select class="form-control thin-dropdown" style="margin-top:10px;" id="find-country" name="find-country">
+                                    <option value="0">Select Country</option>
+                                    @foreach (Country country in ViewBag.Countries)
+                                    {
+                                        <option value="@country.Id" @{ if (country.Id == countryId) { <text>selected="selected"</text>  } }>@country.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <hr class="divider-for-small" />
+                            <div><strong>By Profession</strong></div>
+                            <div>
+                                <select class="form-control thin-dropdown" id="find-professions-category" name="find-professions-category">
+                                    <option value="0">Select Category</option>
+                                    @foreach (Profession prof in ViewBag.Professions)
+                                    {
+                                        <option value="@prof.Id">@prof.Name</option>
+                                    }
+                                </select>
+                                <div id="divGetSubCategoriesLoading" style="display:none;margin:2px;">
+                                    <b class="text-primary" style="font-size:x-small;">LOADING SUB-CATEGORIES...</b><img class="pull-right" src="~/images/loadingbar.gif" style="width:150px;opacity:.5;" />
+                                </div>
+                                <select class="form-control thin-dropdown" style="margin-top:10px;visibility:hidden;" id="find-professions-subcategory" name="find-professions-subcategory"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div><button type="submit" class="btn btn-primary pull-right">Search</button></div>
+                </div>
+            </div>
+            </form>
+    </div>
+    <div class="tab-pane @{ if(activeTab == 2){ <text>active</text> } }" id="tab2">
+    
+    </div>
+</div>
+
+@if(((IList<Account>)Model).Count() > 0)
+{
+    <div class="panel panel-info" style="margin:20px;">
+    <h4 class="panel-heading">Search Results</h4>
+    <div class="panel-body" style="padding:10px;">
+        @{  foreach(Account acct in (IList<Account>)Model)
+            {
+                <div class="list-group-item">
+                    <div class="row list-group-item-text">
+                        <div class="col-md-2">
+                            <a href="~/account/profileview?id=@acct.Id"><img class="circularProfilePic2" src="~/profilepics/@acct.ProfilePic" style="width:75px;height:75px;" /></a>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="text-left"><a href="~/account/profileview?id=@acct.Id"><b>@string.Format("{0} {1}", acct.Firstname, acct.Lastname)</b></a></div>
+                            <div class="text-left"><a href="~/account/profileview?id=@acct.Id"><b>@string.Format("{0}, {1}", acct.State.Name, acct.Country.Name)</b></a></div>
+                            <div class="text-left" style="color:@acct.Status.Color"><div class="status" style="background-color:@acct.Status.Color"></div>&nbsp;@acct.Status.Name</div>
+                            
+                            @{ ViewBag.StarHeight = 17; }
+                            @Html.Partial("Ratings", acct.Rating)
+                                
+                            @{  System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                                foreach (AccountProfession ap in acct.AccountProfessions)
+                                {
+                                    sb.Append(string.Format(", {0}",  ap.Profession.Name));
+                                }
+                                if (sb.Length > 0) { sb.Remove(0, 1); };
+                            }
+                            @Html.Raw(sb.ToString())
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-info btn-block">Send Rolodex Invite</a>
+                            <a class="btn btn-info btn-block">Send Message</a>
+                            <a class="btn btn-info btn-block">Rating/Reviews</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+}

@@ -1,0 +1,457 @@
+﻿@using Referrals.ReferralsServices
+@{
+    ViewBag.Title = "My Referrals";
+    
+    Account acctCurrent = (Account)Session["User"];
+
+    int activeTab = Request.QueryString["tab"] != null ? int.Parse(Request.QueryString["tab"]) : 1;
+    
+    ServiceCallResult scrRefs;
+    IEnumerable<Communication> iReferred = CommSvc.GetReferrals(1, (activeTab == 1 ? true : false), out scrRefs);
+    IEnumerable<Communication> referredToMe = CommSvc.GetReferrals(2, (activeTab == 2 ? true : false), out scrRefs);
+    IEnumerable<Communication> referred = CommSvc.GetReferrals(3, (activeTab == 3 ? true : false), out scrRefs);
+    IEnumerable<Communication> archived = CommSvc.GetReferrals(4, (activeTab == 4 ? true : false), out scrRefs);
+
+    var nameFrom = string.Empty;
+    var nameTo = string.Empty;
+    var nameReferred = string.Empty;
+
+    int? nameFromId = 0;
+    int? nameToId = 0;
+    int? nameReferId = 0;
+    
+    var fromName = string.Empty;
+    var toName = string.Empty;
+    var emailSent = string.Empty;
+
+    ViewBag.StarHeight = 19;
+
+    
+}
+
+@section Scripts{
+    <script src="~/scripts/referrals.js"></script>
+}
+
+<!-- TODO: Add loading symbol while page first loads -->
+<!-- TODO: Add sorting dropdowns for each tab -->
+<!-- TODO: Add pagination for each tab -->
+<!-- TODO: 'Archive' button functionality -->
+<!-- TODO: 'Rate/Review' button functionality -->
+<!-- TODO: 'Send Message' button functionality -->
+<!-- TODO: 'Send Nudge for Reward $$$' button functionality -->
+<!-- TODO: 'Send Reward $$$' button functionality -->
+<!-- TODO: 'See Reviews' button functionality -->
+
+<br />
+
+<!-- Tabs navigation -->
+<ul class="nav nav-tabs">
+    <li @{ if(activeTab == 1){ <text>class="active"</text> } } ><a id="tab1-link" href="#tab1" data-toggle="tab">I Referred</a></li>
+    <li @{ if(activeTab == 2){ <text>class="active"</text> } } ><a id="tab2-link" href="#tab2" data-toggle="tab">Referred To Me</a></li>
+    <li @{ if(activeTab == 3){ <text>class="active"</text> } } ><a id="tab3-link" href="#tab3" data-toggle="tab">I've Been Referred</a></li>
+    <li @{ if(activeTab == 4){ <text>class="active"</text> } } ><a id="tab4-link" href="#tab4" data-toggle="tab">Archived</a></li>
+</ul>
+
+<!-- Tab Sections -->
+<div class="tab-content">
+
+    <!-- I REFERRED -->
+    <div class="tab-pane @{ if(activeTab == 1){ <text>active</text> } }" id="tab1">
+        @foreach (Communication referral in iReferred)
+        {
+            nameFrom = string.Format("{0} {1}", referral.Account.Firstname, referral.Account.Lastname);
+            nameReferred = string.Format("{0} {1}", referral.Account1.Firstname, referral.Account1.Lastname);
+            nameTo = string.Format("{0} {1}", referral.Account2.Firstname, referral.Account2.Lastname);
+            
+            nameFromId = referral.Account.Id;
+            nameReferId = referral.Account1.Id;
+            nameToId = referral.Account2.Id;
+            
+            <div class="panel panel-primary panel-body-gradient1">
+                <div class="row">
+                    <div class="col-md-4" style="padding-bottom:5px;">
+                        <label for="referral-status">Status</label>&nbsp;@referral.Status.Name
+                        <a data-id="@referral.Id" data-name="<b>@nameFrom.ToUpper()</b> referred <b>@nameReferred</b> to <b>@nameTo</b>" class="referralsarchive btn btn-info btn-sm pull-right" href="#referralsArchive" data-toggle="modal">Archive</a>
+                        <div class="panel panel-primary panel-small">
+                            <div class="panel-heading">
+                                <div><a href="~/account/profileview?id=@nameFromId"><b>@nameFrom.ToUpper()</b></a><br />
+                                    referred <a href="~/account/profileview?id=@nameReferId"><b>@nameReferred</b></a> to <a href="~/account/profileview?id=@nameToId"><b>@nameTo</b></a>
+                                </div>
+                            </div>
+                            <div class="panel-body panel-small-body">
+                                <table class="table table-striped">
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div><b>Referral Rating</b>
+                            &nbsp;<span style="font-size:9pt;">( for <a href="~/account/profileview?id=@nameReferId">@nameReferred</a> )</span>
+                            &nbsp;&nbsp;<a data-id="@nameReferId" data-name="@nameReferred" class="referralsrating btn btn-info btn-sm" style="margin:2px;" href="#referralsRating" data-toggle="modal">Rate / Review</a>
+                            &nbsp;&nbsp;<a data-id="@nameReferId" data-name="@nameReferred" class="referralsmessage btn btn-info btn-sm" href="#referralsSendMessage" data-toggle="modal">Send Message</a>
+                            &nbsp;&nbsp;<a data-id="@nameReferId" data-name="@nameReferred" class="referralssendnudge btn btn-info btn-sm" href="#referralsSendNudge" data-toggle="modal">Send Nudge For Reward $$$</a>
+                        </div>
+                        <div>
+                            @Html.Partial("Ratings", referral.Account1.Rating)
+                        </div>
+                        <p></p>
+                        <label>Referral Reviews</label><a data-id="@nameReferId" data-name="@nameReferred" href="#referralsReadMore" data-toggle="modal" class="referralsreadmore btn btn-sm btn-info" style="margin:5px;">see reviews (4)</a>
+                        <div style="font-size:small;">
+                            adf asd fasdfa sdfas dfasf adf asd fasdfa sdfas dfasf adf asd sdfas dfasf adf asd...
+                        </div>
+                        <hr style="border:solid 1px #ff006e;" />
+                        <div><b>Referral Rating</b>
+                            &nbsp;<span style="font-size:9pt;">( for <a href="~/account/profileview?id=@nameToId">@nameTo</a> )</span>
+                            &nbsp;&nbsp;<a data-id="@nameToId" data-name="@nameTo" class="referralsrating btn btn-info btn-sm" style="margin:2px;" href="#referralsRating" data-toggle="modal">Rate / Review</a>
+                            &nbsp;&nbsp;<a data-id="@nameToId" data-name="@nameTo" class="referralsmessage btn btn-info btn-sm" href="#referralsSendMessage" data-toggle="modal">Send Message</a>
+                            &nbsp;&nbsp;<a data-id="@nameToId" data-name="@nameTo" class="referralssendnudge btn btn-info btn-sm" href="#referralsSendNudge" data-toggle="modal">Send Nudge For Reward $$$</a>
+                        </div>
+                        <div>
+                            @Html.Partial("Ratings", referral.Account2.Rating)
+                        </div>
+                        <p></p>
+                        <label>Referral Reviews</label><a data-id="@nameToId" data-name="@nameTo" href="#referralsReadMore" data-toggle="modal" class="referralsreadmore btn btn-sm btn-info" style="margin:5px;">see reviews (4)</a>
+                        <div style="font-size:small;">
+                            adf asd fasdfa sdfas dfasf adf asd fasdfa sdfas dfasf adf asd sdfas dfasf adf asd...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <!-- END OF I REFERRED -->
+
+    <!-- REFERRED TO ME -->
+    <div class="tab-pane @{ if(activeTab == 2){ <text>active</text> } }" id="tab2">
+        @foreach (Communication referral in referredToMe)
+        {
+            nameFrom = string.Format("{0} {1}", referral.Account.Firstname, referral.Account.Lastname);
+            nameTo = string.Format("{0} {1}", referral.Account2.Firstname, referral.Account2.Lastname);
+            nameReferred = string.Format("{0} {1}", referral.Account1.Firstname, referral.Account1.Lastname);
+
+            nameFromId = referral.Account.Id;
+            nameReferId = referral.Account1.Id;
+            nameToId = referral.Account2.Id;
+            
+            <div class="panel panel-primary panel-body-gradient1">
+                <div class="row">
+                    <div class="col-md-4" style="padding-bottom:5px;">
+                        <label for="referral-status">Status</label>&nbsp;@referral.Status.Name
+                        <a data-id="@referral.Id" data-name="<b>@nameFrom.ToUpper()</b> referred <b>@nameReferred</b> to <b>@nameTo</b>" class="referralsarchive btn btn-info btn-sm pull-right" href="#referralsArchive" data-toggle="modal">Archive</a>
+                        <div class="panel panel-primary panel-small">
+                            <div class="panel-heading">
+                                <div><a href="~/account/profileview?id=@nameFromId"><b>@nameFrom.ToUpper()</b></a><br />referred <a href="~/account/profileview?id=@nameReferId"><b>@nameReferred</b></a> to <a href="~/account/profileview?id=@nameToId"><b>@nameTo</b></a></div>
+                            </div>
+                            <div class="panel-body panel-small-body">
+                                <a href="#">
+                                <table class="table table-striped">
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                    <div><b>Referral Rating</b>
+                        &nbsp;<span style="font-size:9pt;">( for <a href="~/account/profileview?id=@nameFromId">@nameFrom</a> )</span>
+                        &nbsp;&nbsp;<a data-id="@referral.FromAcctId" data-name="@nameFrom" class="referralsrating btn btn-info btn-sm" style="margin:2px;" href="#referralsRating" data-toggle="modal">Rate / Review</a>
+                        &nbsp;&nbsp;<a data-id="@referral.FromAcctId" data-name="@nameFrom" class="referralsmessage btn btn-info btn-sm" href="#referralsSendMessage" data-toggle="modal">Send Message</a>
+                        &nbsp;&nbsp;<a data-id="@referral.FromAcctId" data-name="@nameFrom" class="referralssendreward btn btn-info btn-sm" href="#referralsSendReward" data-toggle="modal">Send Reward $$$</a>
+                    </div>
+                    <div>@Html.Partial("Ratings", referral.Account.Rating)</div>
+                    <p></p>
+                    <label>Referral Reviews</label><a data-id="@referral.FromAcctId" data-name="@nameFrom" href="#referralsReadMore" data-toggle="modal" class="referralsreadmore btn btn-sm btn-info" style="margin:5px;">see reviews (4)</a>
+                    <div style="font-size:small;">
+                        adf asd fasdfa sdfas dfasf adf asd fasdfa sdfas dfasf adf asd sdfas dfasf adf asd...
+                    </div>
+                    <hr style="border:solid 1px #ff006e;" />
+                    <div><b>Referral Rating</b>
+                        &nbsp;<span style="font-size:9pt;">( for <a href="~/account/profileview?id=@nameReferId">@nameReferred</a> )</span>
+                        &nbsp;&nbsp;<a data-id="@nameReferId" data-name="@nameReferred" class="referralsrating btn btn-info btn-sm" style="margin:2px;" href="#referralsRating" data-toggle="modal">Rate / Review</a>
+                        &nbsp;&nbsp;<a data-id="@nameReferId" data-name="@nameReferred" class="referralsmessage btn btn-info btn-sm" href="#referralsSendMessage" data-toggle="modal">Send Message</a>
+                        &nbsp;&nbsp;<a data-id="@nameReferId" data-name="@nameReferred" class="referralssendreward btn btn-info btn-sm" href="#referralsSendReward" data-toggle="modal">Send Reward $$$</a>
+                    </div>
+                    <div>@Html.Partial("Ratings", referral.Account1.Rating)</div>
+                    <p></p>
+                    <label>Referral Reviews</label><a data-id="@nameReferId" data-name="@nameReferred" href="#referralsReadMore" data-toggle="modal" class="referralsreadmore btn btn-sm btn-info" style="margin:5px;">see reviews (4)</a>
+                    <div style="font-size:small;">
+                        adf asd fasdfa sdfas dfasf adf asd fasdfa sdfas dfasf adf asd sdfas dfasf adf asd...
+                    </div>
+                </div>
+                </div>
+            </div>
+        }
+    </div>
+    <!-- END OF REFERRED TO ME -->
+
+    <!-- I'VE BEEN REFERRED -->
+    <div class="tab-pane @{ if(activeTab == 3){ <text>active</text> } }" id="tab3">
+        @foreach (Communication referral in referred)
+        {
+            nameFrom = string.Format("{0} {1}", referral.Account.Firstname, referral.Account.Lastname);
+            nameReferred = string.Format("{0} {1}", referral.Account1.Firstname, referral.Account1.Lastname);
+            nameTo = string.Format("{0} {1}", referral.Account2.Firstname, referral.Account2.Lastname);
+
+            nameFromId = referral.Account.Id;
+            nameReferId = referral.Account1.Id;
+            nameToId = referral.Account2.Id;
+            
+            <div class="panel panel-primary panel-body-gradient1">
+                <div class="row">
+                    <div class="col-md-4" style="padding-bottom:5px;">
+                        <label for="referral-status">Status</label>&nbsp;@referral.Status.Name
+                        <a data-id="@referral.Id" data-name="<b>@nameFrom.ToUpper()</b> referred <b>@nameReferred</b> to <b>@nameTo</b>" class="referralsarchive btn btn-info btn-sm pull-right" href="#referralsArchive" data-toggle="modal">Archive</a>
+                        <div class="panel panel-primary panel-small">
+                            <div class="panel-heading">
+                                <div><a href="~/account/profileview?id=@nameFromId"><b>@nameFrom.ToUpper()</b></a><br />referred <a href="~/account/profileview?id=@nameReferId"><b>@nameReferred</b></a> to <a href="~/account/profileview?id=@nameToId"><b>@nameTo</b></a></div>
+                            </div>
+                            <div class="panel-body panel-small-body">
+                                <a href="#">
+                                <table class="table table-striped">
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div><b>Referral Rating</b>
+                            &nbsp;<span style="font-size:9pt;">( for <a href="~/account/profileview?id=@nameFromId">@nameFrom</a> )</span>
+                            &nbsp;&nbsp;<a data-id="@referral.FromAcctId" data-name="@nameFrom" class="referralsrating btn btn-info btn-sm" style="margin:2px;" href="#referralsRating" data-toggle="modal">Rate / Review</a>
+                            &nbsp;&nbsp;<a data-id="@referral.FromAcctId" data-name="@nameFrom" class="referralsmessage btn btn-info btn-sm" href="#referralsSendMessage" data-toggle="modal">Send Message</a>
+                            &nbsp;&nbsp;<a data-id="@referral.FromAcctId" data-name="@nameFrom" class="referralssendreward btn btn-info btn-sm" href="#referralsSendReward" data-toggle="modal">Send Reward $$$</a>
+                        </div>
+                        <div>@Html.Partial("Ratings", referral.Account.Rating)</div>
+                        <p></p>
+                        <label>Referral Reviews</label><a data-id="@referral.FromAcctId" data-name="@nameFrom" href="#referralsReadMore" data-toggle="modal" class="referralsreadmore btn btn-sm btn-info" style="margin:5px;">see reviews (4)</a>
+                        <div style="font-size:small;">
+                            adf asd fasdfa sdfas dfasf adf asd fasdfa sdfas dfasf adf asd sdfas dfasf adf asd...
+                        </div>
+                        <hr style="border:solid 1px #ff006e;" />
+                        <div><b>Referral Rating</b>
+                            &nbsp;<span style="font-size:9pt;">( for <a href="~/account/profileview?id=@nameToId">@nameTo</a> )</span>
+                            &nbsp;&nbsp;<a data-id="@nameToId" data-name="@nameTo" class="referralsrating btn btn-info btn-sm" style="margin:2px;" href="#referralsRating" data-toggle="modal">Rate / Review</a>
+                            &nbsp;&nbsp;<a data-id="@nameToId" data-name="@nameTo" class="referralsmessage btn btn-info btn-sm" href="#referralsSendMessage" data-toggle="modal">Send Message</a>
+                            &nbsp;&nbsp;<a data-id="@nameToId" data-name="@nameTo" class="referralssendnudge btn btn-info btn-sm" href="#referralsSendNudge" data-toggle="modal">Send Nudge For Reward $$$</a>
+                        </div>
+                        <div>@Html.Partial("Ratings", referral.Account1.Rating)</div>
+                        <p></p>
+                        <label>Referral Reviews</label><a data-id="@nameToId" data-name="@nameTo" href="#referralsReadMore" data-toggle="modal" class="referralsreadmore btn btn-sm btn-info" style="margin:5px;">see reviews (4)</a>
+                        <div style="font-size:small;">
+                            adf asd fasdfa sdfas dfasf adf asd fasdfa sdfas dfasf adf asd sdfas dfasf adf asd...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <!-- END OF I'VE BEEN REFERRED -->
+
+    <!-- ARCHIVED REFERRALS -->
+    <div class="tab-pane @{ if(activeTab == 4){ <text>active</text> } }" id="tab4">
+        @foreach (Communication referral in archived)
+        {
+            nameFrom = string.Format("{0} {1}", referral.Account.Firstname, referral.Account.Lastname);
+            nameReferred = string.Format("{0} {1}", referral.Account1.Firstname, referral.Account1.Lastname);
+            nameTo = string.Format("{0} {1}", referral.Account2.Firstname, referral.Account2.Lastname);
+
+            nameFromId = referral.Account.Id;
+            nameReferId = referral.Account1.Id;
+            nameToId = referral.Account2.Id;
+            
+            <div class="panel panel-primary panel-body-gradient1">
+                <div class="row">
+                    <div class="col-md-4" style="padding-bottom:5px;">
+                        <label for="referral-status">Status</label>&nbsp;@referral.Status.Name
+                        <div class="panel panel-primary panel-small">
+                            <div class="panel-heading">
+                                <div><a href="~/account/profileview?id=@nameFromId"><b>@nameFrom.ToUpper()</b></a><br />referred <a href="~/account/profileview?id=@nameReferId"><b>@nameReferred</b></a> to <a href="~/account/profileview?id=@nameToId"><b>@nameTo</b></a></div>
+                            </div>
+                            <div class="panel-body panel-small-body">
+                                <a href="#">
+                                <table class="table table-striped">
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div><b>Referral Rating</b>&nbsp;<span style="font-size:9pt;">( for <a href="~/account/profileview?id=@nameFromId">@nameFrom</a> )</span></div>
+                        <div>@Html.Partial("Ratings", referral.Account.Rating)</div>
+                        <p></p>
+                        <label>Referral Reviews</label><a data-id="@referral.FromAcctId" data-name="@nameFrom" href="#referralsReadMore" data-toggle="modal" class="referralsreadmore btn btn-sm btn-info" style="margin:5px;">see reviews (4)</a>
+                        <div style="font-size:small;">
+                            adf asd fasdfa sdfas dfasf adf asd fasdfa sdfas dfasf adf asd sdfas dfasf adf asd...
+                        </div>
+                        <hr style="border:solid 1px #ff006e;" />
+                        <div><b>Referral Rating</b>&nbsp;<span style="font-size:9pt;">( for <a href="~/account/profileview?id=@nameToId">@nameTo</a> )</span></div>
+                        <div>@Html.Partial("Ratings", referral.Account2.Rating)</div>
+                        <p></p>
+                        <label>Referral Reviews</label><a data-id="@nameToId" data-name="@nameTo" href="#referralsReadMore" data-toggle="modal" class="referralsreadmore btn btn-sm btn-info" style="margin:5px;">see reviews (4)</a>
+                        <div style="font-size:small;">
+                            adf asd fasdfa sdfas dfasf adf asd fasdfa sdfas dfasf adf asd sdfas dfasf adf asd...
+                        </div>
+                        <hr style="border:solid 1px #ff006e;" />
+                        <div><b>Referral Rating</b>&nbsp;<span style="font-size:9pt;">(for <a href="~/account/profileview?id=@nameReferId">@nameReferred</a></span></div>
+                        <div>@Html.Partial("Ratings", referral.Account1.Rating)</div>
+                        <p></p>
+                        <label>Referral Reviews</label><a data-id="@nameReferId" data-name="@nameReferred" href="#referralsReadMore" data-toggle="modal" class="referralsreadmore btn btn-sm btn-info" style="margin:5px;">see reviews (4)</a>
+                        <div style="font-size:small;">
+                            adf asd fasdfa sdfas dfasf adf asd fasdfa sdfas dfasf adf asd sdfas dfasf adf asd...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <!-- END OF ARCHIVED REFERRALS -->
+</div>
+
+<!-- Modal Referral Rating -->
+<div class="modal fade" id="referralsRating" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="form-horizontal">
+                <div class="modal-header">
+                    <b style="font-weight:bold;">Referral Rating for <span id="referrals-rating-name"></span></b>
+                    <input id="referrals-rating-accountid" type="hidden" value="0" />
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="message-text" class="col-lg-2 control-label">Rating</label>
+                        <div class="col-lg-10">
+                            &nbsp;&nbsp;<input type="radio" name="referrals-rating" value="1" />1
+                            &nbsp;&nbsp;<input type="radio" name="referrals-rating" value="2" />2
+                            &nbsp;&nbsp;<input type="radio" name="referrals-rating" value="3" />3
+                            &nbsp;&nbsp;<input type="radio" name="referrals-rating" value="4" />4
+                            &nbsp;&nbsp;<input type="radio" name="referrals-rating" value="5" />5
+                            &nbsp;&nbsp;<input type="radio" name="referrals-rating" value="6" />6
+                            &nbsp;&nbsp;<input type="radio" name="referrals-rating" value="7" />7
+                            &nbsp;&nbsp;<input type="radio" name="referrals-rating" value="8" />8
+                            &nbsp;&nbsp;<input type="radio" name="referrals-rating" value="9" />9
+                            &nbsp;&nbsp;<input type="radio" name="referrals-rating" value="10" />10
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="message-text" class="col-lg-2 control-label">Review</label>
+                        <div class="col-lg-10">
+                            <textarea class="form-control" id="referrals-rating-review" rows="3" ></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
+                    <button id="btnSaveReferralRating" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for sending a message to someone -->
+<div class="modal fade" id="referralsSendMessage" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="form-horizontal">
+                <div class="modal-header">
+                    <p style="font-weight:bold;">Send Message to <span id="referrals-message-name"></span></p>
+                    <input type="hidden" id="referrals-message-accountid" value="0" />
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="referrals-message-text" class="col-lg-2 control-label">Message</label>
+                        <div class="col-lg-10">
+                            <textarea class="form-control" id="referrals-message-text" rows="3" ></textarea>
+                            <div style="padding:10px;">
+                                <input class="input-medium" style="margin:5px 1px 10px 10px;" type="checkbox" value="msg" title="Message" checked="checked" disabled="disabled" />Internal Message
+                                <input class="input-medium" style="margin:5px 1px 10px 10px;" type="checkbox" value="email" title="Email" />Email
+                                <input class="input-medium" style="margin:5px 1px 10px 10px;" type="checkbox" value="txtmsg" title="Text Message" />Text Message
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
+                    <button id="btnSendMessage" class="btn btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for reading reviews -->
+<div class="modal fade" id="referralsReadMore" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="form-horizontal">
+                <div class="modal-header">
+                    <p style="font-weight:bold;">Referral Reviews for <span id="referrals-readmore-name"></span></p>
+                </div>
+                <div class="modal-body" id="referrals-review-text">asfasdf</div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for reading emails -->
+<div class="modal fade" id="referralsViewEmail" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="form-horizontal">
+                <div class="modal-header">
+                    <div><b>Sent</b>&nbsp;<span id="referrals-viewemail-sent"></span></div>
+                    <div><b>From</b>&nbsp;<span id="referrals-viewemail-from"></span></div>
+                    <div><b>To</b>&nbsp;<span id="referrals-viewemail-to"></span></div>
+                    <div><b>Subject</b>&nbsp;<span id="referrals-viewemail-subject"></span></div>
+                </div>
+                <div class="modal-body" id="referrals-viewemail-body"></div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal">OK</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Sending Reward -->
+<div class="modal fade" id="referralsSendReward" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="form-horizontal">
+                <div class="modal-header">
+                    <p style="font-weight:bold;">Send Reward to <span id="referrals-sendreward-name"></span></p>
+                    <p class="text-info">Your PayPal account will be used to send payment. Make sure you have a bank account or credit card linked at <a target="_blank" href="https://www.paypal.com">PayPal.com</a>.</p>
+                    <input type="hidden" id="referrals-sendreward-accountid" value="0" />
+                </div>
+                <div class="modal-body">
+                    <div class="form-group padding-margin-small">
+                        <label for="referrals-sendreward-text" class="col-lg-2 control-label">Amount</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="referrals-sendreward-text" style="width:100px;height:25px;" placeholder="$0000.00" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer text-center padding-margin-small">
+                    <img src="~/images/rapidssl.jpg" class="pull-left" style="height:65px;" />
+                    <img src="~/images/paypal.jpg" class="pull-left" style="height:50px;margin-top:7px;" />
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
+                    <button id="btnSendReward" class="btn btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,4 @@
+2014.04.04 14:56:34 ||| Gilbert Sauceda ||| gilbert.sauceda@gmail.com ||| 512-579-1355 ||| The remote server returned an error: (400) Bad Request.
+2014.04.04 14:56:34 ||| Gilbert Sauceda ||| gilbert.sauceda@gmail.com ||| 512-579-1355 ||| There was an error updating contact in SendHub.
+2014.04.04 14:57:33 ||| Gilbert Sauceda ||| gilbert.sauceda@gmail.com ||| 512-579-1355 ||| The remote server returned an error: (400) Bad Request.
+2014.04.04 14:57:33 ||| Gilbert Sauceda ||| gilbert.sauceda@gmail.com ||| 512-579-1355 ||| There was an error updating contact in SendHub.

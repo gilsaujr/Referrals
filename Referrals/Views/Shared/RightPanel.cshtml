@@ -1,0 +1,232 @@
+﻿@using Referrals.ReferralsServices;
+@{
+    Account acct = (Account)Session["User"];
+}
+
+<!-- TODO: Add loading symbol while page first loads -->
+<!-- TODO: Make Search box and Add New Contact fixed, so contacts scroll under -->
+<!-- TODO: 'Refer' button functionality -->
+<!-- TODO: 'Message' button functionality -->
+<!-- TODO: 'History' button functionality -->
+<!-- TODO: 'Remove' button functionality -->
+<!-- TODO: 'Search' button functionality -->
+<!-- TODO: 'Add New Contact' button functionality (four fields under the PLUS button, to easily add someone -->
+<!-- TODO: Check Contact Statuses every 1 minute -->
+
+<div class="panel panel-default" id="rolodexBox">
+    <div class="panel-heading">
+        <div style="background-color:#fff;margin:0px;padding:2px;margin-bottom:10px;width:100%;">
+            <div class="row">
+                <div class="col-xs-10"><input class="form-control pull-left" style="height:25px;width:100%;border:none;padding:1px;" type="text" placeholder="Search Rolodex"></div>
+                <div class="col-xs-2"><a href="#"><img class="pull-right" style="height:20px;width:20px;margin-right:10px;" src="~/images/icon_search.jpg" /></a></div>
+            </div>
+        </div>
+        <div style="color:#808080;background: linear-gradient(to right, #0ff, #fff);margin:0px;padding:2px;margin-bottom:10px;width:100%;">
+            <a href="#addNewContactForm" data-toggle="modal" class="btn btn-info btn-block">
+                Add New Contact
+                <img class="pull-right" style="height:20px;width:20px;margin-right:30px;" src="~/images/icon_addcontact_blue.jpg" />
+            </a>
+        </div>
+    </div>
+    <div id="divRightPanelInner" class="panel-body">
+        <div class="list-group">
+
+            @{  foreach(AccountContact contact in acct.AccountContacts)
+                {
+                    Account contactAcct = contact.Account1;
+                    
+                    <div class="list-group-item">
+                        <div class="list-group-item-heading">
+                            <div class="row">
+                                <div class="col-xs-2"><a href="~/account/profileview?id=@contactAcct.Id"><img class="circularProfilePic2" src="~/profilepics/@contactAcct.ProfilePic" style="width:35px;height:35px;" /></a></div>
+                                <div class="col-xs-10">
+                                    <div class="text-right"><a href="~/account/profileview?id=@contactAcct.Id"><b>@string.Format("{0} {1}", contactAcct.Firstname, contactAcct.Lastname)</b></a></div>
+                                    <div id="status-rolodex-user-@contactAcct.Id" data-id="@contactAcct.Id" class="status-rolodex-user text-right" style="color:@contactAcct.Status.Color">&nbsp;@contactAcct.Status.Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        @{ ViewBag.StarHeight = 17; }
+                        @Html.Partial("Ratings", contactAcct.Rating)
+
+                        <div class="list-group-item-text text-left" style="font-size:8pt;">
+                            
+                            @if (contactAcct.StatusId == 2)
+                            {
+                                <div class="row">
+                                    <div class="col-md-6"><a class="btn btn-default btn-sm btn-block">REFER</a></div>
+                                    <div class="col-md-6"><a class="btn btn-default btn-sm btn-block">MESSAGE</a></div>
+                                </div>
+                            }
+                            else{
+                                <div class="row">
+                                    <div class="col-md-6" style="padding:3px;"><a class="btn btn-primary btn-sm btn-block" href="#referForm" data-toggle="modal" data-referredacctid="@contactAcct.Id" data-referredname="@string.Format("{0} {1}", contactAcct.Firstname, contactAcct.Lastname)">REFER</a></div>
+                                    <div class="col-md-6" style="padding:3px;"><a class="btn btn-primary btn-sm btn-block" href="#messageForm" data-toggle="modal" data-messagecontactid="@contactAcct.Id" data-messagetoname="@string.Format("{0} {1}", contactAcct.Firstname, contactAcct.Lastname)">MESSAGE</a></div>
+                                </div>
+                            }
+                            
+                            @{  System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                                foreach (AccountProfession ap in contactAcct.AccountProfessions)
+                                {
+                                    sb.Append(string.Format(", {0}",  ap.Profession.Name));
+                                }
+                                if (sb.Length > 0) { sb.Remove(0, 1); };
+                            }
+                            @Html.Raw(sb.ToString())
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div><!--panel-body-->
+</div><!--panel-default-->
+
+<!-- Modal for referring someone -->
+<div class="modal fade" id="referForm" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="frmRefer" class="form-horizontal">
+                <input type="hidden" id="refer-referredacctid" />
+                <div class="modal-header">
+                    <p style="font-weight:bold;">Refer <span id="refer-title"></span> To:</p>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-info">
+                        <h5 class="panel-heading">Rolodex</h5>
+                        <div class="panel-body">
+                            <select class="form-control" id="refer-toacctid">
+                                <option value="00000000">New Contact</option>
+                                @foreach (AccountContact contact in acct.AccountContacts.OrderBy(ac => ac.Account1.Firstname))
+                                {
+                                    Account contactAcct = contact.Account1;
+                                    <option value="@contactAcct.Id">@string.Format("{0} {1}", contactAcct.Firstname, contactAcct.Lastname)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div id="divNewContactFields">
+                        <div class="row">
+                            <div class="col-xs-6 panel panel-danger nospace">
+                                <h5 class="panel-heading">First Name <small class="text-danger">(*required*)</small></h5>
+                                <div class="panel-body"><input type="text" class="form-control" id="refer-firstname" placeholder="first name" /></div>
+                            </div>
+                            <div class="col-xs-6 panel panel-danger nospace">
+                                <h5 class="panel-heading">Phone <small class="text-danger">(*required*)</small></h5>
+                                <div class="panel-body"><input type="text" class="form-control" id="refer-phone" placeholder="555-555-5555" /></div>
+                            </div>
+                        </div>
+                        
+                        <p>&nbsp;</p>
+
+                        <div class="row">
+                            <div class="col-xs-6 panel panel-info nospace">
+                                <h5 class="panel-heading">Last Name</h5>
+                                <div class="panel-body"><input type="text" class="form-control" id="refer-lastname" placeholder="last name" /></div>
+                            </div>
+                            <div class="col-xs-6 panel panel-info nospace">
+                                <h5 class="panel-heading">Email</h5>
+                                <div class="panel-body"><input type="text" class="form-control" id="refer-email" placeholder="you@example.com" /></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p>&nbsp;</p>
+
+                    <div class="panel panel-info nospace">
+                        <h5 class="panel-heading">Message</h5>
+                        <div class="panel-body"><textarea class="form-control" id="refer-message" rows="3"></textarea></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="close-modal btn btn-default" data-dismiss="modal">Close</a>
+                    <button id="btnSendReferral" class="btn btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for sending a message to someone -->
+<div class="modal fade" id="messageForm" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="frmMessage" class="form-horizontal">
+                <div class="modal-header">
+                    <p style="font-weight:bold;">Send Message to <span id="message-title"></span></p>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="message-text" class="col-lg-2 control-label">Message</label>
+                        <div class="col-lg-10">
+                            <textarea class="form-control" id="message-text" rows="3" ></textarea>
+                            <div style="padding:10px;">
+                                <input class="input-medium" style="margin:5px 1px 10px 10px;" type="checkbox" value="msg" title="Message" checked="checked" disabled="disabled" />Internal Message
+                                <input class="input-medium" style="margin:5px 1px 10px 10px;" type="checkbox" value="email" title="Email" />Email
+                                <input class="input-medium" style="margin:5px 1px 10px 10px;" type="checkbox" value="txtmsg" title="Text Message" />Text Message
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="close-modal btn btn-default" data-dismiss="modal">Close</a>
+                    <button id="btnSendMessage" class="btn btn-primary">Send</button>
+                </div>
+                <input type="hidden" id="message-contactid" value="0" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for adding a new contact to Rolodex -->
+<div class="modal fade" id="addNewContactForm" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="frmAddNewContact" class="form-horizontal">
+                <div class="modal-header">
+                    <p style="font-weight:bold;">Add Contact To Rolodex</p>
+                    <p style="font-size:small;">Search members by phone. If they don't exist... Provide Info & Click Add. Invite will be sent.</p>
+                </div>
+                <div class="modal-body">
+                    <div id="divAddNewContactError1" class="alert alert-warning" style="display:none;"></div>
+                    <div class="form-group">
+                        <label for="addnewcontact-phone" class="col-lg-2 control-label text-danger" style="font-size:9pt;">Phone *</label>
+                        <div class="col-lg-10 text-right">
+                            <input type="text" class="form-control" id="addnewcontact-phone" placeholder="123-123-1234" />
+                            <div id="divAddNewContactSearching" style="display:none;">
+                                <b class="pull-left text-primary" style="font-size:x-small;">SEARCHING...</b><img class="pull-left" src="~/images/loadingbar.gif" style="width:150px;opacity:.5;" />
+                            </div>
+                            <div id="divAddNewContactSearchFailed" style="display:none;">
+                                <b class="pull-left text-danger" style="font-size:x-small;">Member not found. Fill out form & Click Add.</b>
+                            </div>
+                            <a id="btnSearchPhone" class="btn btn-info btn-sm">Search</a>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="addnewcontact-firstname" class="col-lg-2 control-label text-danger" style="font-size:9pt;padding:5px;">First Name *</label>
+                        <div class="col-lg-10 text-right">
+                            <input type="text" class="form-control" id="addnewcontact-firstname" placeholder="first name" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="addnewcontact-lastname" class="col-lg-2 control-label" style="font-size:9pt;">Last Name</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="addnewcontact-lastname" placeholder="last name" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="addnewcontact-email" class="col-lg-2 control-label" style="font-size:9pt;">Email</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="addnewcontact-email" placeholder="you@example.com" />
+                        </div>
+                    </div>
+                    <div id="divAddNewContactError2" class="alert alert-warning" style="display:none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="close-modal btn btn-default" data-dismiss="modal">Close</a>
+                    <button id="btnAddNewContact" class="btn btn-primary">Add To Rolodex</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    

@@ -1,0 +1,386 @@
+﻿@using Referrals.ReferralsServices;
+@model ServiceCallResult
+@{
+    bool showEditPage = false;
+    ServiceCallResult scr = ((ServiceCallResult)Model);
+    Account acct = scr.DynObject != null ? scr.DynObject : (Account)Session["User"];
+    Account acctCurrent = (Account)Session["User"];
+
+    ViewBag.Title = string.Format("Profile for {0} {1}", acct.Firstname, acct.Lastname);
+}
+
+@section Scripts{
+    <script src="@Url.Content("~/scripts")/profile.js"></script>
+}
+
+<p></p>
+
+@{
+    //Errors
+    if (!scr.Success && !string.IsNullOrEmpty(scr.MessageForUser))
+    {
+        showEditPage = true;
+            
+        <div class="alert alert-danger">
+            <a class="close" data-dismiss="alert">×</a>
+            <strong>Error!</strong>&nbsp;@Html.Raw(scr.MessageForUser)
+        </div>
+    }
+    
+    <!-- TODO: Add loading symbol while page first loads -->
+    <!-- TODO: Get new list of professions -->
+    <!-- TODO: Apply Account Settings flag checks -->
+    <!-- TODO: 'Send Rolodex Invite' button functionality -->
+    <!-- TODO: 'Send Message' button functionality -->
+    <!-- TODO: 'Send Rating/Reviews' button functionality -->
+    <!-- TODO: Make sure updating phone number works, handle SendHub errors correctly (JSON deserialization) -->
+    
+    //*********************************************** EDIT PROFILE **************************************************
+    if(Request["edit"] != null || showEditPage && (acct.Id == acctCurrent.Id) ){
+        <a id="btnViewProfile" class="btn btn-primary btn-medium pull-right" href="~/account/profileview">View Profile</a>
+    
+        <form id="frmProfile" class="form-horizontal" action="~/account/update" method="post" enctype="multipart/form-data">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4 circularProfilePic" style="height:150px;width:150px;background-image:url(../profilepics/@acct.ProfilePic)"></div>
+                    <div class="col-md-8" style="padding-top:10px;">
+                        <div class="text-left" style="color:@acct.Status.Color"><div class="status" style="background-color:@acct.Status.Color"></div>&nbsp;@acct.Status.Name</div>
+           
+                        @{ ViewBag.StarHeight = 25; }
+                        @Html.Partial("Ratings", acct.Rating)
+            
+                        <p style="margin:0px;padding:0px;font-size:xx-small;">&nbsp;</p>
+
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">Profile Pic</h4>
+                            <div class="panel-body"><input type="file" style="padding:5px;height:35px;" class="btn btn-default form-control" id="profile-pic" name="profile-pic" accept="image/*" /></div>
+                        </div>
+
+                        <div class="panel panel-danger">
+                            <h4 class="panel-heading">Phone <small class="text-danger">(*required*)</small></h4>
+                            <div class="panel-body"><input type="text" class="form-control" id="profile-phone" name="profile-phone" placeholder="phone" value="@acct.Phone" /></div>
+                        </div>
+            
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-danger">
+                            <h4 class="panel-heading">First Name <small class="text-danger">(*required*)</small></h4>
+                            <div class="panel-body"><input type="text" class="form-control" id="profile-firstname" name="profile-firstname" placeholder="first name" value="@acct.Firstname" /></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">Middle Name</h4>
+                            <div class="panel-body"><input type="text" class="form-control" id="profile-middlename" name="profile-middlename" placeholder="middle name" value="@acct.Middlename" /></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-danger">
+                            <h4 class="panel-heading">Last Name <small class="text-danger">(*required*)</small></h4>
+                            <div class="panel-body"><input type="text" class="form-control" id="profile-lastname" name="profile-lastname" placeholder="last name" value="@acct.Lastname" /></div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">Address</h4>
+                            <div class="panel-body">
+                                <input type="text" class="form-control" id="profile-address1" name="profile-address1" placeholder="address" value="@acct.Address1" />
+                                <input type="text" class="form-control" style="margin-top:10px;" id="profile-address2" name="profile-address2" placeholder="address continued" value="@acct.Address2" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">City</h4>
+                            <div class="panel-body"><input type="text" class="form-control" id="profile-city" name="profile-city" placeholder="city" value="@acct.City" /></div>
+                        </div>
+
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">State</h4>
+                            <div class="panel-body">
+                                <select class="form-control thin-dropdown" id="profile-state" name="profile-state">
+                                    @foreach (State st in (IList<State>)ViewBag.States)
+                                    {
+                                        <option value="@st.Id" @( (acct.StateId == st.Id) ? "selected='selected'" : string.Empty )>@st.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">Zipcode</h4>
+                            <div class="panel-body"><input type="text" class="form-control" id="profile-zipcode" name="profile-zipcode" placeholder="zipcode" value="@acct.Zipcode" /></div>
+                        </div>
+
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">Country</h4>
+                            <div class="panel-body">
+                                <select class="form-control thin-dropdown" id="profile-country" name="profile-country">
+                                    @foreach (Country country in (IList<Country>)ViewBag.Countries)
+                                    {
+                                        <option value="@country.Id" @( (acct.CountryId == country.Id) ? "selected='selected'" : string.Empty )>@country.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">Password</h4>
+                            <div class="panel-body"><input type="text" class="form-control" id="profile-password" name="profile-password" placeholder="password" /></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">Confirm Password</h4>
+                            <div class="panel-body"><input type="text" class="form-control" id="profile-confirm" placeholder="confirm password" /></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-danger">
+                            <h4 class="panel-heading">Email <small class="text-danger">(*required*)</small></h4>
+                            <div class="panel-body"><input type="text" class="form-control" id="profile-email" name="profile-email" placeholder="email" value="@acct.Email" /></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">Professions</h4>
+                            <div class="panel-body">
+                                <select class="form-control thin-dropdown" id="profile-professions-category">
+                                    <option value="0">Select Category</option>
+                                    @foreach (Profession prof in ViewBag.Professions)
+                                    {
+                                        <option value="@prof.Id">@prof.Name</option>
+                                    }
+                                </select>
+                                <div id="divGetSubCategoriesLoading" style="display:none;margin:2px;">
+                                    <b class="text-primary" style="font-size:x-small;">LOADING SUB-CATEGORIES...</b><img class="pull-right" src="~/images/loadingbar.gif" style="width:150px;opacity:.5;" />
+                                </div>          
+                                <select class="form-control thin-dropdown" style="visibility:hidden;" id="profile-professions-subcategory" name="profile-professions-subcategory"></select>
+                                <a class="btn btn-info btn-block" style="visibility:hidden;" id="profile-professions-addtolist">Add To List</a>
+                                <p style="margin:0px;padding:0px;">&nbsp;</p>
+                                <div>
+                                    <select class="form-control" style="font-size:9pt;" multiple="multiple" id="profile-professions-acct" name="profile-professions-acct">
+                                        @foreach (AccountProfession ap in acct.AccountProfessions)
+                                        {
+                                            <option value="@ap.ProfessionId">@ap.Profession.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div><button type="button" class="btn btn-info btn-block" id="profile-professions-removefromlist">Remove Selected Profession</button></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">Locations</h4>
+                            <div class="panel-body">
+                                <input type="text" class="form-control input-block" placeholder="enter city / area / neighborhood" id="profile-location-city" name="profile-location-city" />
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <select class="form-control input-block-level thin-dropdown" id="profile-location-state">
+                                            <option value="0">select state</option>
+                                            @foreach (State st in (IList<State>)ViewBag.States)
+                                                {
+                                                    <option value="@st.Id" @( (acct.StateId == st.Id) ? "selected='selected'" : string.Empty )>@st.Name</option>
+                                                }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select class="form-control input-block-level thin-dropdown" id="profile-location-country">
+                                            <option value="0">select country</option>
+                                            @foreach (Country country in (IList<Country>)ViewBag.Countries)
+                                            {
+                                                <option value="@country.Id" @( (acct.CountryId == 1) ? "selected='selected'" : string.Empty )>@country.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div><a class="btn btn-info btn-block" id="profile-locations-add">Add To List</a></div>
+                                <p style="margin:0px;padding:0px;">&nbsp;</p>
+                                <div>
+                                    <select class="form-control" style="font-size:9pt;" multiple="multiple" id="profile-locations-acct" name="profile-locations-acct">
+                                        @foreach (AccountLocation al in acct.AccountLocations)
+                                        {
+                                            <option value="@al.Name|@al.State.Id|@al.Country.Id">@al.Name, @al.State.Name @al.Country.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div><button type="button" class="btn btn-info btn-block" id="profile-locations-remove">Remove Selected Location</button></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" style="padding:5px;">
+                        <div class="panel panel-info">
+                            <h4 class="panel-heading">PayPal Address <small class="text-info">(to Send/Receive Rewards)</small></h4>
+                            <div class="panel-body"><input type="text" class="form-control" placeholder="you@example.com" value="@acct.Paypal" id="profile-paypal" name="profile-paypal" /></div>
+                        </div>
+                        <div><a id="btnSaveProfile" class="btn btn-primary btn-block center-block" style="font-size:medium;margin-top:20px;">Save Changes</a></div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="updateProfile" value="1" />
+        </form>
+    }
+    //*********************************************** END OF EDIT PROFILE **************************************************
+    
+    //*********************************************** VIEW PROFILE **************************************************
+    else
+    {
+        if (acct.Id == acctCurrent.Id)
+        {
+            <a id="btnEditProfile" class="btn btn-primary btn-medium pull-right" href="~/account/profileview?edit=1">Edit Profile</a>
+        }
+    
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4 circularProfilePic" style="height:150px;width:150px;background-image:url(../profilepics/@acct.ProfilePic)"></div>
+                <div class="col-md-8" style="padding-top:10px;">
+                    <div class="text-left" style="color:@acct.Status.Color"><div class="status" style="background-color:@acct.Status.Color"></div>&nbsp;@acct.Status.Name</div>
+           
+                    @{ ViewBag.StarHeight = 25; }
+                    @Html.Partial("Ratings", acct.Rating)
+            
+                    <div style="margin:5px;">
+                        <a class="btn btn-info">Send Rolodex Invite</a>
+                        <a class="btn btn-info">Send Message</a>
+                        <a class="btn btn-info">Rating/Reviews</a>
+                    </div>
+
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">Phone</h4>
+                        <div class="panel-body">@acct.Phone</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">First Name</h4>
+                        <div class="panel-body">@acct.Firstname</div>
+                    </div>
+                </div>
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">Middle Name</h4>
+                        <div class="panel-body">@acct.Middlename</div>
+                    </div>
+                </div>
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">Last Name</h4>
+                        <div class="panel-body">@acct.Lastname</div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="row">
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">Address</h4>
+                        <div class="panel-body">@acct.Address1</div>
+                        <div class="panel-body">@acct.Address2</div>
+                    </div>
+                </div>
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">City</h4>
+                        <div class="panel-body">@acct.City</div>
+                    </div>
+                </div>
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">State</h4>
+                        <div class="panel-body">@acct.State.Name</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">Zipcode</h4>
+                        <div class="panel-body">@acct.Zipcode</div>
+                    </div>
+                </div>
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">Country</h4>
+                        <div class="panel-body">@acct.Country.Name</div>
+                    </div>
+                </div>
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">Email</h4>
+                        <div class="panel-body">@acct.Email</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">Professions</h4>
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                            @foreach (AccountProfession ap in acct.AccountProfessions)
+                            {
+                                <tr>
+                                    <td>@ap.Profession.Name</td>
+                                </tr>
+                            }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">Locations</h4>
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                            @foreach (AccountLocation al in acct.AccountLocations)
+                            {
+                                var sLoc = string.Format("{0}, {1}, {2}", al.Name, al.State.Name, al.Country.Name);
+                    
+                                <tr>
+                                    <td>@sLoc</td>
+                                </tr>
+                            }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4" style="padding:5px;">
+                    <div class="panel panel-info">
+                        <h4 class="panel-heading">PayPal Account&nbsp;<small class="text-info">(to Send/Receive Rewards)</small></h4>
+                        <div class="panel-body">@acct.Paypal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    //*********************************************** END OF VIEW PROFILE **************************************************
+
+    //Errors
+    if (!scr.Success && !string.IsNullOrEmpty(scr.MessageForUser))
+    {
+        <div class="alert alert-danger">
+            <a class="close" data-dismiss="alert">×</a>
+            <strong>Error!</strong>&nbsp;@Html.Raw(scr.MessageForUser)
+        </div>
+    }
+}

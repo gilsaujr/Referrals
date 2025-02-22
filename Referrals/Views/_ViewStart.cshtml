@@ -1,0 +1,9 @@
+﻿@using Referrals.ReferralsServices
+@{
+    //Login/Logout logic
+    SecuritySvc.SecurePage();
+    
+    //Layout logic
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+    if (Session["User"] != null && Request.Url.ToString().ToLower().IndexOf("account/login") == -1) { Layout = "~/Views/Shared/_Layout.cshtml"; }
+}

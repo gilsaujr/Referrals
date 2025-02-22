@@ -1,0 +1,458 @@
+﻿@using Referrals.ReferralsServices
+@{
+    ViewBag.Title = "My Dashboard";
+
+    Account acctCurrent = (Account)Session["User"];
+
+    int iReferred = acctCurrent.Communications.Where(c => c.CommMethodId == (int)CommType.InternalMessage && c.ActionId == (int)ActionType.Referral && c.Archived == false).Count();
+    int referredToMe = acctCurrent.Communications2.Where(c => c.CommMethodId == (int)CommType.InternalMessage && c.ActionId == (int)ActionType.Referral && c.Archived == false).Count();
+    int referred = acctCurrent.Communications1.Where(c => c.CommMethodId == (int)CommType.InternalMessage && c.ActionId == (int)ActionType.Referral && c.Archived == false).Count();
+
+    int contacts = acctCurrent.AccountContacts1.Count();
+    int invitesSent = acctCurrent.Communications.Where(c => c.CommMethodId == (int)CommType.InternalMessage && c.ActionId == (int)ActionType.Invitation && c.Archived == false).Count();
+    int invitesRec = acctCurrent.Communications2.Where(c => c.CommMethodId == (int)CommType.InternalMessage && c.ActionId == (int)ActionType.Invitation && c.Archived == false).Count();
+
+    int jobsPosted = acctCurrent.Jobs.Where(j => j.PostedByAcctId == acctCurrent.Id).Count();
+    int jobRefsSentToMe = acctCurrent.Communications2.Where(c => c.CommMethodId == (int)CommType.InternalMessage && c.ActionId == (int)ActionType.Referral && c.Archived == false && c.JobId != null && c.Job.PostedByAcctId == acctCurrent.Id).Count();
+    int jobsIAmReferred = acctCurrent.Communications1.Where(c => c.CommMethodId == (int)CommType.InternalMessage && c.ActionId == (int)ActionType.Referral && c.Archived == false && c.JobId != null).Count();
+    
+}
+
+@section Scripts{
+    <script type="text/javascript" src="~/scripts/dashboard.js"></script>
+}
+
+<div class="container-fluid" style="padding:10px;">
+    <div class="page-header nospace">
+        <h3>Sending Referrals Is Easy!</h3>
+        <p>Use the menus above and modules below, to start your experience.</p>
+    </div>
+
+    <p>&nbsp;</p>
+
+    <div class="row-fluid">
+        <div class="col-md-4" style="margin-bottom:20px;">
+            <img class="center-block" src="~/images/icon_referral3.jpg" style="height:50px;" />
+            <div class="panel panel-info no-margin"><b>Referrals I've Sent ( <a href="~/referrals/manage">@iReferred</a> )</b></div>
+            <div class="panel panel-info no-margin"><b>Referrals Sent To Me ( <a href="~/referrals/manage?tab=2">@referredToMe</a> )</b></div>
+            <div class="panel panel-info no-margin"><b>I've Been Referred ( <a href="~/referrals/manage?tab=3">@referred</a> )</b></div>
+            <div><button class="referralmodules btn btn-info btn-block no-margin" data-toggle="#referralModules" id="btnReferralModules">My Referrals&nbsp;&nbsp;&nbsp;<b class="caret"></b></button></div>
+        </div>
+        <div class="col-md-4" style="margin-bottom:20px;">
+            <img class="center-block" src="~/images/icon_rolodex2.jpg" style="height:50px;" />
+            <div class="panel panel-info no-margin"><b>Contacts In My Rolodex ( <a href="~/rolodex/manage">@contacts</a> )</b></div>
+            <div class="panel panel-info no-margin"><b>Invites I've Sent ( <a href="~/rolodex/manage?tab=2">@invitesSent</a> )</b></div>
+            <div class="panel panel-info no-margin"><b>Invites I've Received ( <a href="~/rolodex/manage?tab=3">@invitesRec</a> )</b></div>
+            <div><button class="rolodexmodules btn btn-info btn-block no-margin" data-toggle="#rolodexModules" id="btnRolodexModules">My Rolodex&nbsp;&nbsp;<b class="caret"></b></button></div>
+        </div>
+        <div class="col-md-4" style="margin-bottom:20px;">
+            <img class="center-block" src="~/images/icon_jobs.jpg" style="height:50px;" />
+            <div class="panel panel-info no-margin"><b>Jobs I've Posted ( <a href="~/jobs/manage?myjobs=1">@jobsPosted</a> )</b></div>
+            <div class="panel panel-info no-margin"><b>Referrals Sent For My Jobs ( <a href="~/referrals/manage?tab=2&myjobs=1">@jobRefsSentToMe</a> )</b></div>
+            <div class="panel panel-info no-margin"><b>Jobs I Am The Referral ( <a href="~/referrals/manage?tab=3&myjobs=1">@jobsIAmReferred</a> )</b></div>
+            <div class="nospace"><button class="jobmodules btn btn-info btn-block no-margin" data-toggle="#jobModules" id="btnJobModules">Jobs&nbsp;&nbsp;<b class="caret"></b></button></div>
+        </div>
+    </div>
+    
+    <a href="#referralModules"></a>
+    <div id="referralModules" class="modules">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Sending A Generic Referral</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access your Rolodex</b> (<img src="~/images/icon_rolodex.jpg" style="height:25px;" /> icon in Mobile Version)</li>
+                            <li><b>Click <button class="btn btn-sm btn-primary">Refer</button> button</b></li>
+                            <li><b>Provide Name and Phone</b> of person receiving the <b>Referral</b></li>
+                            <li><b>Click <button class="btn btn-sm btn-primary">Send</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Sending A Job Referral</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/jobs/manage">Jobs</a> page</b> (from top navigation menu)</li>
+                            <li><b>Find the Job Posting you like</b></li>
+                            <li><b>Click the <button class="btn btn-sm btn-info">Refer</button> button</b></li>
+                            <li><b>Fill out form and Click the <button class="btn btn-sm btn-primary">Send</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Getting Paid For A Referral</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/referrals/manage">My Referrals</a> page</b> (from top navigation menu)</li>
+                            <li><b>Click <a href="~/referrals/manage?tab=1">I Referred</a> OR <a href="~/referrals/manage?tab=2">I've Been Referred</a> tab</b></li>
+                            <li><b>Click <button class="btn btn-sm btn-info">Send Nudge for Reward</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Paying For A Referral</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/referrals/manage">My Referrals</a> page</b> (from top navigation menu)</li>
+                            <li><b>Click <a href="~/referrals/manage">Referred To Me</a> OR <a href="~/referrals/manage?tab=3">Ive Been Referred</a> tab</b></li>
+                            <li><b>Click <button class="btn btn-sm btn-info">Send Reward</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Rate/Review A Referral</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/referrals/manage">My Referrals</a> page</b> (from top navigation menu)</li>
+                            <li><b>Click any tab</b></li>
+                            <li><b>Click <button class="btn btn-sm btn-info">Rate/Review</button> button</b> (next to name involved in referral)</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <a href="#rolodexModules"></a>
+    <div id="rolodexModules" class="modules">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Adding A Contact To My Rolodex</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access your Rolodex</b> (<img src="~/images/icon_rolodex.jpg" style="height:25px;" /> icon in Mobile Version)</li>
+                            <li><b>Click <img src="~/images/icon_addcontact.jpg" style="height:20px;" /> button</b></li>
+                            <li>To Search for existing member, <b>provide a Phone Number</b> and <b>Click <button class="btn btn-info btn-sm">Search</button></b></li>
+                            <li>If contact does not exist, <b>Provide Name and Phone Number</b></li>
+                            <li><b>Click <button class="btn btn-sm btn-primary">Add To Rolodex</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Removing A Contact From My Rolodex</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/rolodex/manage">My Rolodex</a> page</b> (from top navigation menu)</li>
+                            <li><b>Find your Contact and Click <button class="btn btn-sm btn-info">Remove</button> button</b></li>
+                            <li><b>Validate your removal by clicking <button class="btn btn-sm btn-primary">Yes</button> in the pop-up dialog box</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Sending A Quick Message From My Rolodex</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access your Rolodex</b> (<img src="~/images/icon_rolodex.jpg" style="height:25px;" /> icon in Mobile Version)</li>
+                            <li><b>Click <button class="btn btn-sm btn-primary">Message</button> button</b> (below your Contact's name)</li>
+                            <li><b>Provide Message</b> and <b>check methods of communication</b></li>
+                            <li><b>Click <button class="btn btn-sm btn-primary">Send</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Reviewing Contact History From My Rolodex</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/rolodex/manage">My Rolodex</a> page</b> (from top navigation menu)</li>
+                            <li><b>Find your Contact and Click <button class="btn btn-sm btn-info">View History</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Searching For Contacts In My Rolodex</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access your Rolodex</b> (<img src="~/images/icon_rolodex.jpg" style="height:25px;" /> icon in Mobile Version)</li>
+                            <li>Find <b>Search box</b> on top and <b>type in person's firstname or lastname</b></li>
+                            <li><b>Click <img src="~/images/icon_search.jpg" style="height:20px;" /> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Managing My Rolodex Invites</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/rolodex/manage">My Rolodex</a> page</b> (from top navigation menu)</li>
+                            <li><b>Click on '<a href="~/rolodex/manage?tab=2">Invitations I've Sent'</a>' tab or <a href="~/rolodex/manage?tab=3">Invitations Sent To Me'</a> tab</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="#jobModules"></a>
+    <div id="jobModules" class="modules">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Posting A Job</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/jobs/manage">Jobs</a> page</b> (from top navigation menu)</li>
+                            <li><b>Click <button class="btn btn-sm btn-primary">Post a Job</button> button</b></li>
+                            <li><b>Fill out form</b> and <b>Click <button class="btn btn-sm btn-primary">Post</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Editing My Job Posting</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/jobs/manage">Jobs</a> page</b> (from top navigation menu)</li>
+                            <li><b>Search</b> for your Job Posting and <b>Click <button class="btn btn-sm btn-info">Edit</button> button</b></li>
+                            <li><b>Fill out form and Click <button class="btn btn-sm btn-primary">Save Changes</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Removing My Job Posting</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/jobs/manage">Jobs</a> page</b> (from top navigation menu)</li>
+                            <li><b>Search</b> for your Job Posting and <b>Click <button class="btn btn-sm btn-info">Close</button> button</b></li>
+                            <li>Validate removal by <b>Clicking the <button class="btn btn-sm btn-primary">Yes</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Refer Someone For A Job</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/jobs/manage">Jobs</a> page</b> (from top navigation menu)</li>
+                            <li><b>Find the Job Posting</b> you like</li>
+                            <li><b>Click the <button class="btn btn-sm btn-info">Refer</button> button</b></li>
+                            <li><b>Fill out form</b> and <b>Click the <button class="btn btn-sm btn-primary">Send</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Ask A Question, About A Job</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/jobs/manage">Jobs</a> page</b> (from top navigation menu)</li>
+                            <li><b>Find the Job Posting</b> you like</li>
+                            <li><b>Click the <button class="btn btn-sm btn-info">Ask Question</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Getting Paid Job Referral Fee</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/referrals/manage">My Referrals</a> page</b> (from top navigation menu)</li>
+                            <li><b>Click <a href="~/referrals/manage?tab=1">I Referred</a> OR <a href="~/referrals/manage?tab=2">I've Been Referred</a> tab</b></li>
+                            <li><b>Click <button class="btn btn-sm btn-info">Send Nudge for Reward</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p>&nbsp;</p>
+
+    <div class="row-fluid">
+        <div class="col-md-3 no-margin" style="margin-bottom:20px;">
+            <img class="center-block" src="~/images/icon_professional.jpg" style="height:50px;" />
+            <button class="findprofmodules btn btn-info btn-block" data-toggle="#findProfModules" id="btnFindProfModules">Finding Professionals&nbsp;&nbsp;<b class="caret"></b></button>
+        </div>
+        <div class="col-md-3 no-margin" style="margin-bottom:20px;">
+            <img class="center-block" src="~/images/icon_user_settings.jpg" style="height:50px;" />
+            <button class="profilemodules btn btn-info btn-block" data-toggle="#profileModules" id="btnProfileModules">Profile/Account Settings&nbsp;&nbsp;<b class="caret"></b></button>
+        </div>
+        <div class="col-md-3 no-margin" style="margin-bottom:20px;">
+            <img class="center-block" src="~/images/icon_mail.jpg" style="height:50px;" />
+            <button class="messagemodules btn btn-info btn-block" data-toggle="#messageModules" id="btnMessageModules">Messages&nbsp;&nbsp;<b class="caret"></b></button>
+        </div>
+        <div class="col-md-3 no-margin" style="margin-bottom:20px;">
+            <img class="center-block" src="~/images/icon_notifications2.jpg" style="height:50px;" />
+            <button class="notificationmodules btn btn-info btn-block" data-toggle="#notificationModules" id="btnNotificationModules">Notifications&nbsp;&nbsp;<b class="caret"></b></button>
+        </div>
+    </div>
+    
+    <a href="#findProfModules"></a>
+    <div id="findProfModules" class="modules">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Searching For Professionals For My Rolodex</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/members/manage">Find Professionals</a> page</b> (from top navigation menu)</li>
+                            <li><b>Click <a href="~/members/manage?tab=1">Search Members</a> tab</b></li>
+                            <li>Use the filters on top of the page and <b>Click the <button class="btn btn-sm btn-primary">Search</button> button</b></li>
+                            <li>In Search Results, <b>Click <button class="btn btn-sm btn-info">Send Rolodex Invite</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Finding Friends On My Social Sites</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/members/manage">Find Professionals</a> page</b> (from top navigation menu)</li>
+                            <li><b>Click <a href="~/members/manage?tab=2">Search Social Sites</a> tab</b></li>
+                            <li>Use the filters provided and <b>Click the <button class="btn btn-sm btn-primary">Search</button> button</b></li>
+                            <li>In Search Results, <b>Click <button class="btn btn-sm btn-info">Send Rolodex Invite</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="#profileModules"></a>
+    <div id="profileModules" class="modules">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Updating My Profile Information</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/account/profileview"><img src="~/images/icon_profile2.jpg" style="height:20px;" />Profile</a> page</b> (from left navigation menu, <img src="../images/icon_person.jpg" style="height:20px;" /> in Mobile Version)</li>
+                            <li><b>Click <button class="btn btn-sm btn-primary">Edit Profile</button> button</b></li>
+                            <li><b>Fill out form</b> and <b>Click <button class="btn btn-sm btn-primary">Save Changes</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Updating My Account Settings</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/account/manage"><img src="~/images/icon_settings2.jpg" style="height:20px;" />Account Settings</a> page</b> (from left navigation menu, <img src="../images/icon_person.jpg" style="height:20px;" /> in Mobile Version)</li>
+                            <li><b>Select checkboxes</b> for communication settings</li>
+                            <li><b>Click <button class="btn btn-sm btn-primary">Save Changes</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="#messageModules"></a>
+    <div id="messageModules" class="modules">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Sending Someone A Message</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/account/profileview">Messages</a> page</b> (from left navigation menu, <img src="../images/icon_person.jpg" style="height:20px;" /> in Mobile Version)</li>
+                            <li><b>Click the <button class="btn btn-sm btn-primary">Send Message</button> button</b> on each page</li>
+                            <li><b>Fill out form</b> and <b>Click <button class="btn btn-sm btn-primary">Send</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Replying To A Message</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/account/profileview">Messages</a> page</b> (from left navigation menu, <img src="../images/icon_person.jpg" style="height:20px;" /> in Mobile Version)</li>
+                            <li>Then <b>Click <img src="~/images/icon_messages.jpg" style="height:20px;" /> icon</b></li>
+                            <li><b>Click on Message</b></li>
+                            <li><b>On <a href="~/messages/manage">Messages</a> page, use conversation panel to write back, and Click <button class="btn btn-sm btn-primary">Send</button> button</b></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Checking All Messages</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/account/profileview">Messages</a> page</b> (from left navigation menu, <img src="../images/icon_person.jpg" style="height:20px;" /> in Mobile Version)</li>
+                            <li>Then <b>Click <img src="~/images/icon_messages.jpg" style="height:20px;" /> icon</b></li>
+                            <li><b>Click on <a href="~/messages/manage">'View All Messages'</a></b> link</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="#notificationModules"></a>
+    <div id="notificationModules" class="modules">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Receiving Notifications</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/account/profileview">Notifications</a> page</b> (from left navigation menu, <img src="../images/icon_person.jpg" style="height:20px;" /> in Mobile Version)</li>
+                            <li>Then <b>Click <img src="~/images/icon_notifications.jpg" style="height:20px;" /> icon</b></li>
+                            <li><b>Click on Notification</b>, and you will be taken to the appropriate page</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Checking All Notifications</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Access <a href="~/account/profileview">Notifications</a> page</b> (from left navigation menu, <img src="../images/icon_person.jpg" style="height:20px;" /> in Mobile Version)</li>
+                            <li>Then <b>Click <img src="~/images/icon_notifications.jpg" style="height:20px;" /> icon</b></li>
+                            <li><b>Click on '<a href="~/messages/notifications">View All Notifications</a>'</b> link</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><strong>Notification Types</strong></div>
+                    <div class="panel-body">
+                        <ol>
+                            <li><b>Referral</b> has been sent to me.</li>
+                            <li>I've been <b>Referred</b>.</li>
+                            <li><b>Rolodex Invitation</b> has been sent to me.</li>
+                            <li><b>Nudge</b> has been sent to me.</li>
+                            <li><b>Reward</b> has been sent to me.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

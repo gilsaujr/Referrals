@@ -1,0 +1,144 @@
+﻿@using Referrals.ReferralsServices;
+@{
+    //Login/Logout logic
+    SecuritySvc.SecurePage();
+    
+    Account acct = (Account)Session["User"];
+
+    ServiceCallResult scrConvos;
+    IEnumerable<Conversation> convos = CommSvc.GetMyConversations(true, 5, out scrConvos);
+
+    ServiceCallResult scrNotes;
+    IEnumerable<Communication> notes = CommSvc.GetMyNotifications(5, out scrNotes);
+}
+
+<!-- TODO: Add loading symbol while page first loads -->
+<!-- TODO: Make Notifications & Messages fixed, so profile scrolls under -->
+<!-- TODO: Redo Message and Notification lists. 
+            Load them on demand, show loading symbol in div while loading, 
+            then limit list to top 5, 
+            display 'more' link if there are more and link it to All Messages page -->
+<!-- TODO: Check for New Messages & Notifications every 1 minute -->
+<!-- TODO: Enable Share links -->
+<!-- TODO: Add location with Google Maps links (last logged in location) -->
+<!-- TODO: Status functionality -->
+
+<div class="panel panel-default" id="leftPanel">
+    <!-- Messages -->
+    <div class="row">
+        <div class="col-xs-4 btn btn-default dropdown" style="padding:0px;margin:0px;">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding:2px;margin:0px;">
+                <b id="msgCount" class="msgCount" style="display:none;"></b>
+                <img src="~/Images/icon_messages.jpg" style="height:30px;" /><b class="caret"></b>
+            </a>
+            <ul id="ulMsgs" class="dropdown-menu" style="text-align:left;left:15px;">
+                @Html.Partial("~/Views/Messages/LeftPanelMsgDropDown.cshtml", convos)
+            </ul>
+        </div>
+        <div class="col-xs-4 btn btn-default dropdown" style="padding:0px;margin:0px;">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding:2px;margin:0px;">
+                <b id="noteCount" class="msgCount" style="display:none;"></b>
+                <img src="~/Images/icon_notifications.jpg" style="height:30px;" /><b class="caret"></b>
+            </a>
+            <ul id="ulNotes" class="dropdown-menu" style="text-align:left;">
+                @Html.Partial("~/Views/Messages/LeftPanelNotesDropDown.cshtml", notes)
+            </ul>
+        </div>
+        <div class="col-xs-4 btn btn-default dropdown" style="padding:0px;margin:0px;">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding:2px;margin:0px;"><img src="~/Images/icon_settings.jpg" style="height:30px;" /><b class="caret"></b></a>
+            <ul id="ulAcctSettings" class="dropdown-menu" style="text-align:left;">
+                <li class="divider" style="margin:0px;"></li>
+                <li style="text-align:left;width:100%;">
+                    <a href="~/account/profileview">
+                        <div class="row">
+                            <div class="col-xs-3 nospace"><img src="~/images/icon_profile2.jpg" class="pull-left" style="height:30px;" /></div>
+                            <div class="col-xs-9 nospace">&nbsp;Profile</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="divider" style="margin:0px;"></li>
+                <li style="text-align:left;width:100%;">
+                    <a href="~/account/manage">
+                        <div class="row">
+                            <div class="col-xs-3 nospace"><img src="~/images/icon_settings2.jpg" class="pull-left" style="height:30px;" /></div>
+                            <div class="col-xs-9 nospace">&nbsp;Account Settings</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="divider" style="margin:0px;"></li>
+                <li style="text-align:left;width:100%;">
+                    <a href="~/account/rewards">
+                        <div class="row">
+                            <div class="col-xs-3 nospace"><img src="~/images/icon_dollar.jpg" class="pull-left" style="height:30px;" /></div>
+                            <div class="col-xs-9 nospace">&nbsp;My Rewards</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="divider" style="margin:0px;"></li>
+                <li style="text-align:left;width:100%;">
+                    <a href="~/account/login?logout=1">
+                        <div class="row">
+                            <div class="col-xs-3 nospace"><img src="~/images/icon_logout2.jpg" class="pull-left" style="height:30px;" /></div>
+                            <div class="col-xs-9 nospace">&nbsp;Logout</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="divLeftPanelInner" class="panel-body">
+        <div class="row" style="background:transparent;">
+            <div class="col-xs-4">
+                <div class="circularProfilePic" style="background-image:url(../profilepics/@acct.ProfilePic)"></div>
+            </div>
+            <div class="col-xs-8" style="margin-top:20px;">
+                <div class="text-left"><b>@string.Format("{0} {1}", acct.Firstname, acct.Lastname)</b></div>
+                <div id="status-current-user" data-id="@acct.Id" class="text-left" style="color:@acct.Status.Color">&nbsp;@acct.Status.Name</div>
+            </div>
+        </div>
+
+        @{ ViewBag.StarHeight = 19; }
+        @Html.Partial("Ratings", acct.Rating)
+                
+        <!-- Share icons -->
+        <div id="shareIcons" style="margin:5px 0px 5px 0px;">
+            <a href="#"><img src="@Url.Content("~/images")/icon_linkedin.jpg" /></a>
+            <a href="#"><img src="@Url.Content("~/images")/icon_facebook.jpg" /></a>
+            <a href="#"><img src="@Url.Content("~/images")/icon_googleplus.jpg" /></a>
+            <a href="#"><img src="@Url.Content("~/images")/icon_twitter.jpg" /></a>
+            <a href="#"><img src="@Url.Content("~/images")/icon_pinterest.jpg" /></a>
+            <a href="#"><img src="@Url.Content("~/images")/icon_youtube.jpg" /></a>
+            <a href="#"><img src="@Url.Content("~/images")/icon_email.jpg" /></a>
+            <a href="#"><img src="@Url.Content("~/images")/icon_plus.jpg" /></a>
+        </div>
+        <hr />
+
+        <!-- Personal Info -->
+        <div class="details">
+            Professions:<br />
+            <ul>@{  foreach (AccountProfession prof in acct.AccountProfessions)
+                    {
+                        <li>@prof.Profession.Name</li>
+                    }
+                }
+            </ul>
+        </div>    
+        <div class="details">
+            Locations:<br />
+            <ul>@{  foreach (AccountLocation loc in acct.AccountLocations)
+                    {
+                        <li>@loc.Name, @loc.State.Abbrev</li>
+                    }
+                }
+            </ul>
+        </div>
+
+        <hr style="margin-top:50px;" />
+        <div>
+            <img src="~/images/rapidssl.jpg" class="pull-left" style="height:65px;" />
+            <img src="~/images/paypal.jpg" class="pull-left" style="height:50px;margin-top:7px;" />
+        </div>       
+
+    </div><!--panel-body-->
+</div><!-- panel-default -->

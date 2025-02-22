@@ -1,0 +1,64 @@
+﻿@using Referrals.ReferralsServices
+@model IList<Job>
+@{
+    ViewBag.Title = "Jobs";
+    
+    Account acctCurrent = (Account)Session["User"];
+}
+
+<a class="btn btn-primary pull-right" style="margin:10px 10px 10px 0px;" href="#frmPostJob" data-toggle="modal">Post a Job</a>
+<p>&nbsp;</p>
+
+<!-- TODO: Add loading symbol while page first loads -->
+<!-- TODO: Add filter to search by -->
+<!-- TODO: Add sorting dropdowns -->
+<!-- TODO: Add pagination -->
+<!-- TODO: 'Edit' button functionality -->
+<!-- TODO: 'Close' button functionality -->
+<!-- TODO: 'Refer' button functionality -->
+<!-- TODO: 'Ask Question' button functionality -->
+<!-- TODO: 'Post a Job' button functionality -->
+
+@foreach(Job job in ((IList<Job>)Model))
+{
+    <div class="panel panel-info" style="margin:20px;">
+        <div class="panel-heading" style="padding:5px;">
+            <strong>@string.Format("JOB-{0,22:D6}", job.Id)&nbsp;&nbsp;|&nbsp;&nbsp;@job.Name</strong>
+            @{ 
+                if(acctCurrent.Id == job.Account.Id)
+                {
+                    <a style="margin:2px;" class="btn btn-sm btn-info" href="#frmEditJob" data-toggle="modal">Edit</a>
+                    <a style="margin:2px;" class="btn btn-sm btn-info" href="#frmCloseJob" data-toggle="modal">Close</a>
+                }
+            }
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    @job.Description
+                    <hr class="divider-for-small" />
+                </div>
+                <div class="col-md-4" style="border-left:solid 1px #e7e7e7;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div><label>Status</label></div>
+                            <div><small>@job.Status.Name</small></div>
+                            <hr class="divider-for-small" />
+                        </div>
+                        <div class="col-md-6">
+                            <div><label>Referral Fee</label></div>
+                            <div><small>$@job.ReferralFee</small></div>
+                        </div>
+                    </div>
+                    <hr class="divider" />
+                    <div><label>Posted By</label></div>
+                    <div><small><a href="~/account/profileview?id=@job.Account.Id">@string.Format("{0} {1}", job.Account.Firstname, job.Account.Lastname) | @job.Created</a></small></div>
+                </div>
+                <div class="col-md-2">
+                    <a class="btn btn-info btn-block">Refer</a>
+                    <a class="btn btn-info btn-block">Ask Question</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

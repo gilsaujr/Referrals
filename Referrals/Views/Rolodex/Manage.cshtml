@@ -1,0 +1,53 @@
+﻿@{
+    ViewBag.Title = "My Rolodex";
+
+    int activeTab = Request.QueryString["tab"] != null ? int.Parse(Request.QueryString["tab"]) : 1;
+}
+
+<!-- Tabs navigation -->
+<ul class="nav nav-tabs">
+    <li @{ if(activeTab == 1){ <text>class="active"</text> } } ><a id="tab1-link" href="#tab1" data-toggle="tab">My Contacts</a></li>
+    <li @{ if(activeTab == 2){ <text>class="active"</text> } } ><a id="tab2-link" href="#tab2" data-toggle="tab">Invitations I've Sent</a></li>
+    <li @{ if(activeTab == 3){ <text>class="active"</text> } } ><a id="tab3-link" href="#tab3" data-toggle="tab">Invitations Sent To Me</a></li>
+</ul>
+
+<!-- Tab Sections -->
+<div class="tab-content">
+
+    <!-- MY CONTACTS -->
+    <div class="tab-pane @{ if(activeTab == 1){ <text>active</text> } }" id="tab1">
+
+
+    </div>
+
+    <!-- INVITATIONS I'VE SENT -->
+    <div class="tab-pane @{ if(activeTab == 1){ <text>active</text> } }" id="tab2">
+
+
+    </div>
+
+    <!-- INVITATIONS SENT TO ME -->
+    <div class="tab-pane @{ if(activeTab == 1){ <text>active</text> } }" id="tab3">
+
+
+    </div>
+</div>
+
+<p>&nbsp;</p>
+MY CONTACTS<br />
+<a class="btn btn-info btn-sm">RATING / REVIEWS</a>
+<a class="btn btn-info btn-sm">HISTORY</a>
+<a class="btn btn-info btn-sm">REMOVE</a>
+
+<p>&nbsp;</p>
+
+INVITATIONS I'VE SENT<br />
+<a class="btn btn-info btn-sm">CANCEL</a>
+SHOW STATUS
+
+<p>&nbsp;</p>
+
+INVITATIONS SENT TO ME<br />
+<a class="btn btn-info btn-sm">ACCEPT</a>
+<a class="btn btn-info btn-sm">DENY</a>
+SHOW STATUS

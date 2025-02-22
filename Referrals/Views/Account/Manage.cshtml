@@ -1,0 +1,179 @@
+﻿@using Referrals.ReferralsServices
+@model ServiceCallResult
+
+@{
+    ViewBag.Title = "My Account Settings";
+    ServiceCallResult scr = (ServiceCallResult)Model;
+
+    Account acctCurrent = (Account)Session["User"];
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('#btnSaveSettings').click(function (e) {
+
+                $('#procMsg').text('Updating Account, please wait...');
+                $('#modalProcessing').modal('show');
+                setTimeout(function () {
+                    $('#frmSettings').submit();
+                }, 3000);
+
+            });
+        });
+    </script>
+}
+
+@if(scr != null)
+{
+    if (scr.Success)
+    {
+        <div class="alert alert-success">
+            <a class="close" data-dismiss="alert">×</a>
+            <strong>Your Account Settings were updated successfully!</strong>
+        </div>
+    }
+}
+
+<!-- TODO: Add loading symbol while page first loads -->
+<!-- TODO: Add Hide Location (ability to be found for jobs / referrals could be affected) -->
+
+<form id="frmSettings" action="/account/update" method="post" style="margin-top:10px;">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-info">
+                    <h4 class="panel-heading">When someone sends me a Referral:</h4>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <h4 class="list-group-item-heading">Notify me by:</h4>
+                                <p class="list-group-item-text"><input type="checkbox" checked="checked" disabled="disabled" value="1" /><small>Internal Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IGetReferralSendMeTxtMsg){ <text>checked="checked"</text>; } } name="settings-iGetReferralSendMeTxtMsg" value="2" /><small>Text Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IGetReferralSendMeEmail){ <text>checked="checked"</text>; } } name="settings-iGetReferralSendMeEmail" value="3" /><small>Email</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-info">
+                    <h4 class="panel-heading">When someone Refers Me to someone else:</h4>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <h4 class="list-group-item-heading">Notify me by:</h4>
+                                <p class="list-group-item-text"><input type="checkbox" checked="checked" disabled="disabled" value="1" /><small>Internal Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IAmReferralSendMeTxtMsg){ <text>checked="checked"</text>; } } name="settings-iAmReferralSendMeTxtMsg" value="2" /><small>Text Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IAmReferralSendMeEmail){ <text>checked="checked"</text>; } } name="settings-iAmReferralSendMeEmail" value="3" /><small>Email</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-info">
+                    <h4 class="panel-heading">When I'm added to someone's Rolodex</h4>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <h4 class="list-group-item-heading">Send me an Invitation by:</h4>
+                                <p class="list-group-item-text"><input type="checkbox" checked="checked" disabled="disabled" value="1" /><small>Internal Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IGetRolodexInviteSendMeTxtMsg){ <text>checked="checked"</text>; } } name="settings-iGetRolodexInviteSendMeTxtMsg" value="2" /><small>Text Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IGetRolodexInviteSendMeEmail){ <text>checked="checked"</text>; } } name="settings-iGetRolodexInviteSendMeEmail" value="3" /><small>Email</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-info">
+                    <h4 class="panel-heading">When I receive a Reward</h4>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <h4 class="list-group-item-heading">Notify me by:</h4>
+                                <p class="list-group-item-text"><input type="checkbox" checked="checked" disabled="disabled" value="1" /><small>Internal Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IGetRewardSendMeTxtMsg){ <text>checked="checked"</text>; } } name="settings-iGetRewardSendMeTxtMsg" value="2" /><small>Text Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IGetRewardSendMeEmail){ <text>checked="checked"</text>; } } name="settings-iGetRewardSendMeEmail" value="3" /><small>Email</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-info">
+                    <h4 class="panel-heading">When I receive a Nudge</h4>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <h4 class="list-group-item-heading">Notify me by:</h4>
+                                <p class="list-group-item-text"><input type="checkbox" checked="checked" disabled="disabled" value="1" /><small>Internal Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IGetNudgeSendMeTxtMsg){ <text>checked="checked"</text>; } } name="settings-iGetNudgeSendMeTxtMsg" value="2" /><small>Text Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IGetNudgeSendMeEmail){ <text>checked="checked"</text>; } } name="settings-iGetNudgeSendMeEmail" value="3" /><small>Email</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-info">
+                    <h4 class="panel-heading">When I receive an Internal Message</h4>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <h4 class="list-group-item-heading">Notify me by:</h4>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IGetMessageSendMeTxtMsg){ <text>checked="checked"</text>; } } name="settings-iGetMessageSendMeTxtMsg" value="2" /><small>Text Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IGetMessageSendMeEmail){ <text>checked="checked"</text>; } } name="settings-iGetMessageSendMeEmail" value="3" /><small>Email</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-info">
+                    <h4 class="panel-heading">When I receive a question, about my Job Posting</h4>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <h4 class="list-group-item-heading">Notify me by:</h4>
+                                <p class="list-group-item-text"><input type="checkbox" checked="checked" disabled="disabled" value="1" /><small>Internal Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.IGetJobQuestionSendMeTxtMsg){ <text>checked="checked"</text>; } } name="settings-iGetJobQuestionSendMeTxtMsg" value="2" /><small>Text Message</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if (acctCurrent.IGetJobQuestionSendMeEmail) { <text>checked="checked"</text>; } } name="settings-iGetJobQuestionSendMeEmail" value="3" /><small>Email</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-info">
+                    <h4 class="panel-heading">My Privacy Settings</h4>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <h4 class="list-group-item-heading">Profile:</h4>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.HidePhoneNumber){ <text>checked="checked"</text>; } } name="settings-hidePhoneNumber" value="1" /><small>Hide my phone number</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" @{ if(acctCurrent.HideEmailAddress){ <text>checked="checked"</text>; } } name="settings-hideEmailAddress" value="1" /><small>Hide email address</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" checked="checked" disabled="disabled" value="1" /><small>Hide my address</small></p>
+                                <p class="list-group-item-text"><input type="checkbox" checked="checked" disabled="disabled" value="1" /><small>Hide my Paypal address</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="text-right">
+                <a id="btnSaveSettings" class="btn btn-primary btn-block">Save Changes</a>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="updateSettings" value="1" />
+</form>

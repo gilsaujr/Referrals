@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Referrals - @ViewBag.Title</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="~/css/font-awesome.css" rel="stylesheet">
+        <link href="~/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="~/css/login.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        @Html.Partial("HeaderLogin")
+
+        <div class="container-fluid">@RenderBody()</div>
+
+        <!-- Modals -->
+        <div class="modal fade" id="signupform" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div id="frmSignUp" class="form-horizontal">
+                        <div class="modal-header">
+                            <p>Sign Up with REFERRALS</p>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="contact-name" class="col-lg-2 control-label">Firstname</label>
+                                <div class="col-lg-10">
+                                    <input type="text" class="form-control" id="signup-firstname" placeholder="first name" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-name" class="col-lg-2 control-label">Lastname</label>
+                                <div class="col-lg-10">
+                                    <input type="text" class="form-control" id="signup-lastname" placeholder="last name" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email" class="col-lg-2 control-label">Phone</label>
+                                <div class="col-lg-10">
+                                    <input type="text" class="form-control" id="signup-phone" placeholder="123-123-1234" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email" class="col-lg-2 control-label">Email</label>
+                                <div class="col-lg-10">
+                                    <input type="text" class="form-control" id="signup-email" placeholder="you@example.com" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email" class="col-lg-2 control-label">Password</label>
+                                <div class="col-lg-10">
+                                    <input type="password" class="form-control" id="signup-password" placeholder="password" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email" class="col-lg-2 control-label">Confirm Password</label>
+                                <div class="col-lg-10">
+                                    <input type="password" class="form-control" id="signup-confirmpassword" placeholder="confirm password" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
+                            <button id="btnSignUpSend" class="btn btn-primary">Sign Up</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalProcessing" tabindex="-1" role="dialog" aria-labelledby="modalProcessingTitle" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title" id="modalProcessingTitle">Referrals.com</h4>
+              </div>
+                <div class="modal-body">
+                    <div class="center-block">
+                        <div id="procMsg" style="text-align:center;"></div>
+                        <img class="center-block" src="~/images/loading_animated.gif" style="width:60px;" />
+                    </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="modalOk" tabindex="-1" role="dialog" aria-labelledby="modalOkTitle" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title" id="modalOkTitle">Referrals.com</h4>
+              </div>
+              <div class="modal-body">
+                <div class="center-block" id="okMsg" style="text-align:center;"></div>
+              </div>
+              <div class="modal-footer">
+                <a id="btnOK" href="/home/dashboard/" class="btn btn-default" data-dismiss="modal">OK</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <script src="~/scripts/jquery.min.js" ></script>
+        <script src="~/scripts/bootstrap.min.js"></script>
+        <script src="~/scripts/global.js"></script>
+        <script src="~/scripts/login.js"></script>
+    </body>
+</html>
